@@ -11,19 +11,19 @@ import LoadingScreen from "@/components/LoadingScreen";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const Assistant = dynamic(() => import("@/components/Assistant"), {
+const Assistant = dynamic(() => import("@/components/Assistant").then((mod) => mod.default), {
   ssr: false,
   loading: () => <LoadingScreen />,
 });
-const Editor = dynamic(() => import("@/components/Editor"), {
+const Editor = dynamic(() => import("@/components/Editor").then((mod) => mod.default), {
   ssr: false,
   loading: () => <LoadingScreen />,
 });
-const Journal = dynamic(() => import("@/components/Journal"), {
+const Journal = dynamic(() => import("@/components/Journal").then((mod) => mod.default), {
   ssr: false,
   loading: () => <LoadingScreen />,
 });
-const ProjectManager = dynamic(() => import("@/components/ProjectManager"), {
+const ProjectManager = dynamic(() => import("@/components/ProjectManager").then((mod) => mod.default), {
   ssr: false,
   loading: () => <LoadingScreen />,
 });
