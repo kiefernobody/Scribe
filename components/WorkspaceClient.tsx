@@ -12,15 +12,19 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const Assistant = dynamic(() => import("@/components/Assistant"), {
+  ssr: false,
   loading: () => <LoadingScreen />,
 });
 const Editor = dynamic(() => import("@/components/Editor"), {
+  ssr: false,
   loading: () => <LoadingScreen />,
 });
 const Journal = dynamic(() => import("@/components/Journal"), {
+  ssr: false,
   loading: () => <LoadingScreen />,
 });
 const ProjectManager = dynamic(() => import("@/components/ProjectManager"), {
+  ssr: false,
   loading: () => <LoadingScreen />,
 });
 
@@ -37,7 +41,6 @@ const WorkspaceClient: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [isMobileView, setIsMobileView] = useState(false);
-  const [activeMobileComponent, setActiveMobileComponent] = useState<"editor" | "journal" | "assistant">("editor");
   const [showProjectSelector, setShowProjectSelector] = useState(true);
   const [shouldBlurUI, setShouldBlurUI] = useState(false);
 
