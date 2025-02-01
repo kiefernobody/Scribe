@@ -1,0 +1,363 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 20 20 20;
+  --foreground: 245 245 245;
+  --card: 32 32 32;
+  --card-foreground: 245 245 245;
+  --popover: 32 32 32;
+  --popover-foreground: 245 245 245;
+  --primary: 220 38 38;
+  --primary-foreground: 245 245 245;
+  --secondary: 40 40 40;
+  --secondary-foreground: 245 245 245;
+  --muted: 40 40 40;
+  --muted-foreground: 160 160 160;
+  --accent: 220 38 38;
+  --accent-foreground: 245 245 245;
+  --destructive: 255 55 55;
+  --destructive-foreground: 20 20 20;
+  --border: 220 38 38;
+  --input: 40 40 40;
+}
+
+body {
+  @apply bg-background text-foreground font-sans;
+}
+
+/* Base styles */
+.bg-dark-gray {
+  background-color: #202020 !important;
+}
+
+.text-light-gray {
+  color: #f5f5f5 !important;
+}
+
+/* Interactive element styles */
+button,
+.button,
+.dropdown-trigger,
+.interactive-element,
+.bar-area button,
+.assistant-buttons-grid button,
+.word-count-dropdown button,
+.chapter-dropdown button {
+  background-color: #202020 !important;
+  color: #f5f5f5 !important;
+  transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+}
+
+button:hover,
+.button:hover,
+.dropdown-trigger:hover,
+.interactive-element:hover,
+.bar-area button:hover,
+.assistant-buttons-grid button:hover,
+.word-count-dropdown button:hover,
+.chapter-dropdown button:hover {
+  background-color: rgb(var(--primary)) !important;
+  color: rgb(var(--primary-foreground)) !important;
+}
+
+/* Input styles */
+input,
+textarea {
+  @apply bg-dark-gray text-light-gray border-none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(var(--primary), 0.7);
+}
+
+input:focus,
+textarea:focus {
+  box-shadow: 0 0 0 2px rgba(var(--primary), 0.2);
+}
+
+/* Focus styles */
+*:focus {
+  outline: none !important;
+}
+
+/* Custom Scrollbar styles */
+.custom-scrollbar,
+.editor-content,
+.editor-wrapper {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--primary)) rgba(var(--background), 0.3);
+}
+
+.custom-scrollbar::-webkit-scrollbar,
+.editor-content::-webkit-scrollbar,
+.editor-wrapper::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track,
+.editor-content::-webkit-scrollbar-track,
+.editor-wrapper::-webkit-scrollbar-track {
+  background: rgba(var(--background), 0.3);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb,
+.editor-content::-webkit-scrollbar-thumb,
+.editor-wrapper::-webkit-scrollbar-thumb {
+  background-color: rgb(var(--primary));
+  border-radius: 4px;
+  border: 2px solid rgba(var(--background), 0.3);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover,
+.editor-content::-webkit-scrollbar-thumb:hover,
+.editor-wrapper::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(var(--primary), 0.8);
+}
+
+/* Hide default scrollbar arrows */
+.custom-scrollbar::-webkit-scrollbar-button,
+.editor-content::-webkit-scrollbar-button,
+.editor-wrapper::-webkit-scrollbar-button {
+  display: none;
+}
+
+/* Editor specific styles */
+.editor-content {
+  @apply custom-scrollbar;
+}
+
+.editor-content h1.chapter-title {
+  @apply text-2xl font-bold my-4 text-center;
+}
+
+.editor-content p {
+  @apply my-2;
+}
+
+.editor-content p.indented {
+  text-indent: 1em;
+  padding-left: 1em;
+  margin-bottom: 0.5em;
+  margin-top: 0;
+}
+
+/* Utility classes */
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.shadow-custom {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Responsive styles */
+@media (max-width: 640px) {
+  .responsive-stack {
+    @apply flex-col items-stretch;
+  }
+
+  .responsive-stack > * {
+    @apply w-full mb-2;
+  }
+
+  .responsive-stack > *:last-child {
+    @apply mb-0;
+  }
+}
+
+/* Minimalistic animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.slide-in {
+  animation: slideInFromBottom 0.3s ease-out;
+}
+
+/* Transition for interactive elements */
+.transition-interactive {
+  transition: all 0.2s ease;
+}
+
+/* Hover effect for interactive elements */
+.hover-lift {
+  transition: transform 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+/* Subtle pulse animation for attention-grabbing elements */
+@keyframes subtlePulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.pulse {
+  animation: subtlePulse 2s infinite ease-in-out;
+}
+
+/* Guided Workspace Input Styles */
+.guided-workspace-input {
+  transition: all 0.2s ease-in-out;
+  font-size: 1rem;
+  line-height: 1.5;
+  outline: none !important;
+  background-color: rgb(var(--card));
+  color: rgb(var(--card-foreground));
+  position: relative;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem;
+  z-index: 50;
+}
+
+.guided-workspace-input:focus {
+  box-shadow: none !important;
+  border-color: rgb(var(--primary)) !important;
+}
+
+/* Remove the fixed positioning */
+/*
+.guided-workspace-input {
+  position: relative;
+  bottom: auto;
+  left: auto;
+  right: auto;
+  padding: 1rem;
+  z-index: 50;
+}
+*/
+
+/* Remove the blur effect */
+/*
+.editor-content {
+  transition: none;
+}
+
+.guided-workspace-blur {
+  filter: none;
+}
+*/
+
+/* Ensure all components have rounded corners */
+.editor-component,
+.journal-component,
+.assistant-component,
+.guided-workspace-container {
+  border-radius: 0.5rem !important;
+}
+
+/* Add some space between the editor and the guided workspace input */
+.guided-workspace-container {
+  margin-bottom: 1rem;
+}
+
+/* Custom switch styles */
+.custom-switch {
+  transform: rotate(0deg) !important;
+}
+
+.custom-switch[data-state="checked"] {
+  background-color: rgb(var(--primary)) !important;
+}
+
+.custom-switch[data-state="unchecked"] {
+  background-color: rgb(var(--muted)) !important;
+}
+
+/* Ensure Assistant toolbars are always visible */
+.assistant-component .toolbar,
+.assistant-component .assistant-buttons-grid {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Guided Workspace Input Styles */
+.guided-workspace-input {
+  transition: all 0.2s ease-in-out;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.guided-workspace-input:focus {
+  outline: none;
+}
+
+/* Ensure all components have consistent styling */
+.input,
+.textarea,
+.guided-workspace-input {
+  background-color: rgb(var(--background));
+  color: rgb(var(--foreground));
+  border-color: rgb(var(--input));
+}
+
+.input:focus,
+.textarea:focus,
+.guided-workspace-input:focus {
+  border-color: rgb(var(--primary));
+  box-shadow: 0 0 0 1px rgb(var(--primary) / 50%);
+}
+
+/* Force custom scrollbar styles */
+.custom-scrollbar {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgb(220, 38, 38) rgba(20, 20, 20, 0.3) !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(20, 20, 20, 0.3) !important;
+  border-radius: 4px !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgb(220, 38, 38) !important;
+  border-radius: 4px !important;
+  border: 2px solid rgba(20, 20, 20, 0.3) !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(220, 38, 38, 0.8) !important;
+}
+
