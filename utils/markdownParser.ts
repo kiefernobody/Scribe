@@ -1,108 +1,42 @@
-import { unified } from "unified"
-import remarkParse from "remark-parse"
-import remarkRehype from "remark-rehype"
-import rehypeStringify from "rehype-stringify"
-import { visit } from "unist-util-visit"
-
-type TreeNode = {
-  type: string
-  children?: TreeNode[]
-  value?: string
-  data?: {
-    hProperties?: {
-      className?: string
-      id?: string
-    }
-  }
+export interface ParsedMarkdown {
+  chapters: { id: string; title: string; content: string }[];
 }
 
-interface ParsedContent {
-  html: string
-  chapters: { id: string; title: string; content: string }[]
-}
-
-export async function parseMarkdown(...) { await 
-    throw new Error(`Invalid markdown input: ${typeof markdown }`)
+export async function parseMarkdown(markdown: string): Promise<ParsedMarkdown> {
+  if (typeof markdown !== "string") {
+    throw new Error(`Invalid markdown input: expected a string but received ${typeof markdown}`);
   }
 
-  const chapters: { id: string; title: string; content: string }[] = []
-  let currentChapter: { id: string; title: string; content: string } | null = null
+  const chapters = markdown
+    .split(/^#\s+/gm) // Splits the markdown content into sections based on headers
+    .filter(Boolean) // Removes empty values from the array
+    .map((section, index) => {
+      const lines = section.split("\n");
+      const title = lines.shift()?.trim() || `Chapter ${index + 1}`;
+      const content = lines.join("\n").trim();
+      return { id: `chapter-${index + 1}`, title, content };
+    });
 
-  try {
-    const result = await unified()
-      .use(remarkParse)
-      .use(() => (tree) => {
-        console.log("Parsed tree:", JSON.stringify(tree, null, 2))
-        visit(tree, (node: TreeNode) => {
-          if (node.type === "heading" && node.depth === 1) {
-            if (node.children && node.children[0] && node.children[0].type === "text") {
-              if (currentChapter) {
-                chapters.push(currentChapter)
-              }
-              const title = node.children[0].value || "Untitled Chapter"
-              const id = `chapter-${Date.now()}-${chapters.length}`
-              currentChapter = { id, title, content: "" }
-              console.log("New chapter:", currentChapter)
-
-              if (!node.data) node.data = {}
-              if (!node.data.hProperties) node.data.hProperties = {}
-              node.data.hProperties.id = id
-              node.data.hProperties.className = "chapter-title"
-              return
-            }
-          } else if (currentChapter) {
-            if (node.type === "paragraph") {
-              // Add indentation to paragraphs
-              currentChapter.content += "<p class='indented'>"
-              if (node.children) {
-                node.children.forEach((child: TreeNode) => {
-                  if (child.type === "text" && child.value) {
-                    currentChapter!.content += child.value.replace(/\s+/g, " ")
-                  } else if (child.type === "break") {
-                    currentChapter!.content += "<br>"
-                  }
-                })
-              }
-              currentChapter.content += "</p>"
-            } else if (node.type === "break") {
-              currentChapter.content += "<br>"
-            }
-          }
-
-          // Remove horizontal rules
-          if (node.type === "thematicBreak") {
-            return null
-          }
-        })
-
-        if (currentChapter) {
-          chapters.push(currentChapter)
-        }
-
-        // If no chapters were found, create a default chapter
-        if (chapters.length === 0) {
-          chapters.push({ id: "chapter-default", title: "Untitled", content: markdown })
-        }
-      })
-      .use(remarkRehype)
-      .use(rehypeStringify)
-      .process(markdown)
-
-    const html = result.toString()
-
-    if (!html) {
-      throw new Error("Failed to generate HTML from markdown")
-    }
-
-    const parsedContent = {
-      html,
-      chapters,
-    }
-    console.log("Parsed content:", JSON.stringify(parsedContent, null, 2))
-    return parsedContent
-  } catch (error) {
-    console.error(`Error in parseMarkdown: ${error instanceof Error ? error.message : String(error)}`)
-    throw error
-  }
+  return { chapters };
 }
 
+/**
+ * Converts HTML content into markdown format.
+ */
+export function htmlToMarkdown(html: string): string {
+  if (typeof html !== "string") {
+    throw new Error(`Invalid HTML input: expected a string but received ${typeof html}`);
+  }
+
+  // Basic HTML to Markdown conversion (extendable for more complex cases)
+  return html
+    .replace(/<\/?strong>/g, "**") // Bold text
+    .replace(/<\/?em>/g, "*") // Italic text
+    .replace(/<\/?h1>/g, "# ") // Header 1
+    .replace(/<\/?h2>/g, "## ") // Header 2
+    .replace(/<\/?h3>/g, "### ") // Header 3
+    .replace(/<\/?p>/g, "\n") // Paragraphs as new lines
+    .replace(/<\/?br\s*\/?>/g, "\n") // Line breaks
+    .replace(/&nbsp;/g, " ") // Convert non-breaking spaces to normal spaces
+    .trim();
+}
