@@ -3,17 +3,17 @@ import type React from "react"
 
 export const handleCommand = async (
   command: string,
-  project: Project,
+  project: Project | null,
   updateBreak: (breakId: string, updates: Partial<Break>) => void,
   addBreak: (title: string) => void,
   removeBreak: (breakId: string) => void,
   switchBreak: (breakId: string) => void,
   updateProjectTitle: (newTitle: string) => void,
-  setProject: React.Dispatch<React.SetStateAction<Project>>,
+  setProject: React.Dispatch<React.SetStateAction<Project | null>>,
   currentBreakId: string,
   setShowProjectSelector: React.Dispatch<React.SetStateAction<boolean>>,
   projects: Project[],
-  updateProjectsInStorage: (updatedProjects: Project[]) => void,
+  updateProjectsInStorage: (projects: Project[]) => void,
 ): Promise<{ success: boolean; message: string; isCommand: boolean; newProject?: Project }> => {
   console.log("Handling command:", command)
 

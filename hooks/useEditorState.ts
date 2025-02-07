@@ -1,72 +1,73 @@
 import { useState, useCallback } from "react"
-import type { Chapter, Project } from "@/types/editor"
+import type { Project, Break } from "@/types/editor"
 import { calculateWordCount } from "@/utils/editorUtils"
 
 export const useEditorState = (initialContent: string) => {
   const [project, setProject] = useState<Project>({
+    id: `project-${Date.now()}`,
     title: "Untitled",
-    chapters: [
+    breaks: [
       {
-        id: "chapter-1",
-        title: "Chapter 1",
+        id: `break-${Date.now()}`,
+        title: "Break 1",
         content: initialContent,
         wordCount: calculateWordCount(initialContent),
       },
     ],
-    currentChapterId: "chapter-1",
+    currentBreakId: `break-${Date.now()}`,
   })
 
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false)
 
-  const getCurrentChapter = useCallback(() => {
-    return project.chapters.find((chapter) => chapter.id === project.currentChapterId) || project.chapters[0]
+  const getCurrentBreak = useCallback(() => {
+    return project.breaks.find((breakItem) => breakItem.id === project.currentBreakId) || project.breaks[0]
   }, [project])
 
-  const updateChapter = useCallback((chapterId: string, updates: Partial<Chapter>) => {
+  const updateBreak = useCallback((breakId: string, updates: Partial<Break>) => {
     setProject((prev) => ({
       ...prev,
-      chapters: prev.chapters.map((chapter) => {
-        if (chapter.id === chapterId) {
-          const updatedChapter = { ...chapter, ...updates }
+      breaks: prev.breaks.map((breakItem) => {
+        if (breakItem.id === breakId) {
+          const updatedBreak = { ...breakItem, ...updates }
           if (updates.content !== undefined) {
-            updatedChapter.wordCount = calculateWordCount(updatedChapter.content)
+            updatedBreak.wordCount = calculateWordCount(updates.content)
           }
-          return updatedChapter
+          return updatedBreak
         }
-        return chapter
+        return breakItem
       }),
     }))
   }, [])
 
-  const addChapter = useCallback((title: string) => {
-    const newChapter: Chapter = {
-      id: `chapter-${Date.now()}`,
+  const addBreak = useCallback((title: string) => {
+    const newBreak: Break = {
+      id: `break-${Date.now()}`,
       title,
       content: "",
       wordCount: 0,
     }
     setProject((prev) => ({
       ...prev,
-      chapters: [...prev.chapters, newChapter],
-      currentChapterId: newChapter.id,
+      breaks: [...prev.breaks, newBreak],
+      currentBreakId: newBreak.id,
     }))
   }, [])
 
-  const removeChapter = useCallback((chapterId: string) => {
+  const removeBreak = useCallback((breakId: string) => {
     setProject((prev) => {
-      const newChapters = prev.chapters.filter((chapter) => chapter.id !== chapterId)
+      const newBreaks = prev.breaks.filter((breakItem) => breakItem.id !== breakId)
       return {
         ...prev,
-        chapters: newChapters,
-        currentChapterId: newChapters.length > 0 ? newChapters[0].id : null,
+        breaks: newBreaks,
+        currentBreakId: newBreaks.length > 0 ? newBreaks[0].id : null,
       }
     })
   }, [])
 
-  const switchChapter = useCallback((chapterId: string) => {
+  const switchBreak = useCallback((breakId: string) => {
     setProject((prev) => ({
       ...prev,
-      currentChapterId: chapterId,
+      currentBreakId: breakId,
     }))
   }, [])
 
@@ -78,31 +79,31 @@ export const useEditorState = (initialContent: string) => {
   }, [])
 
   const getTotalWordCount = useCallback(() => {
-    return project.chapters.reduce((total, chapter) => total + chapter.wordCount, 0)
-  }, [project.chapters])
+    return project.breaks.reduce((total: number, breakItem: Break) => total + breakItem.wordCount, 0)
+  }, [project.breaks])
 
-  const reorderChapters = useCallback((startIndex: number, endIndex: number) => {
+  const reorderBreaks = useCallback((startIndex: number, endIndex: number) => {
     setProject((prev) => {
-      const newChapters = Array.from(prev.chapters)
-      const [reorderedItem] = newChapters.splice(startIndex, 1)
-      newChapters.splice(endIndex, 0, reorderedItem)
-      return { ...prev, chapters: newChapters }
+      const newBreaks = Array.from(prev.breaks)
+      const [reorderedItem] = newBreaks.splice(startIndex, 1)
+      newBreaks.splice(endIndex, 0, reorderedItem)
+      return { ...prev, breaks: newBreaks }
     })
   }, [])
 
   return {
     project,
     setProject,
-    getCurrentChapter,
-    updateChapter,
-    addChapter,
-    removeChapter,
-    switchChapter,
+    getCurrentBreak,
+    updateBreak,
+    addBreak,
+    removeBreak,
+    switchBreak,
     updateProjectTitle,
     isDropdownOpen,
     setIsDropdownOpen,
     getTotalWordCount,
-    reorderChapters,
+    reorderBreaks,
   }
 }
 

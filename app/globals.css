@@ -19,8 +19,19 @@
   --accent-foreground: 245 245 245;
   --destructive: 255 55 55;
   --destructive-foreground: 20 20 20;
-  --border: 220 38 38;
+  --border: 40 40 40;
   --input: 40 40 40;
+  --ring: 40 40 40;
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
 
 body {
@@ -48,6 +59,8 @@ button,
   background-color: #202020 !important;
   color: #f5f5f5 !important;
   transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+  border: 1px solid rgba(var(--border), 0.2) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
 }
 
 button:hover,
@@ -60,23 +73,26 @@ button:hover,
 .chapter-dropdown button:hover {
   background-color: rgb(var(--primary)) !important;
   color: rgb(var(--primary-foreground)) !important;
+  border-color: rgba(var(--border), 0.3) !important;
 }
 
 /* Input styles */
 input,
 textarea {
-  @apply bg-dark-gray text-light-gray border-none;
+  @apply bg-dark-gray text-light-gray;
+  border: 1px solid rgba(var(--border), 0.2) !important;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: rgba(var(--primary), 0.7);
+  color: rgba(var(--muted-foreground), 0.7);
 }
 
 input:focus,
 textarea:focus {
-  box-shadow: 0 0 0 2px rgba(var(--primary), 0.2);
+  box-shadow: 0 0 0 2px rgba(var(--border), 0.2) !important;
+  border-color: rgba(var(--border), 0.3) !important;
 }
 
 /* Focus styles */
@@ -86,45 +102,37 @@ textarea:focus {
 
 /* Custom Scrollbar styles */
 .custom-scrollbar,
-.editor-content,
-.editor-wrapper {
+.custom-scrollbar *,
+body {
   scrollbar-width: thin;
-  scrollbar-color: rgb(var(--primary)) rgba(var(--background), 0.3);
+  scrollbar-color: rgb(var(--primary)) rgba(var(--background), 0.3) !important;
 }
 
 .custom-scrollbar::-webkit-scrollbar,
-.editor-content::-webkit-scrollbar,
-.editor-wrapper::-webkit-scrollbar {
+.custom-scrollbar *::-webkit-scrollbar,
+body::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track,
-.editor-content::-webkit-scrollbar-track,
-.editor-wrapper::-webkit-scrollbar-track {
+.custom-scrollbar *::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
   background: rgba(var(--background), 0.3);
   border-radius: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb,
-.editor-content::-webkit-scrollbar-thumb,
-.editor-wrapper::-webkit-scrollbar-thumb {
+.custom-scrollbar *::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
   background-color: rgb(var(--primary));
   border-radius: 4px;
-  border: 2px solid rgba(var(--background), 0.3);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover,
-.editor-content::-webkit-scrollbar-thumb:hover,
-.editor-wrapper::-webkit-scrollbar-thumb:hover {
+.custom-scrollbar *::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover {
   background-color: rgba(var(--primary), 0.8);
-}
-
-/* Hide default scrollbar arrows */
-.custom-scrollbar::-webkit-scrollbar-button,
-.editor-content::-webkit-scrollbar-button,
-.editor-wrapper::-webkit-scrollbar-button {
-  display: none;
 }
 
 /* Editor specific styles */
@@ -153,7 +161,7 @@ textarea:focus {
 }
 
 .shadow-custom {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Responsive styles */
@@ -252,29 +260,6 @@ textarea:focus {
   border-color: rgb(var(--primary)) !important;
 }
 
-/* Remove the fixed positioning */
-/*
-.guided-workspace-input {
-  position: relative;
-  bottom: auto;
-  left: auto;
-  right: auto;
-  padding: 1rem;
-  z-index: 50;
-}
-*/
-
-/* Remove the blur effect */
-/*
-.editor-content {
-  transition: none;
-}
-
-.guided-workspace-blur {
-  filter: none;
-}
-*/
-
 /* Ensure all components have rounded corners */
 .editor-component,
 .journal-component,
@@ -307,57 +292,5 @@ textarea:focus {
   display: flex !important;
   opacity: 1 !important;
   visibility: visible !important;
-}
-
-/* Guided Workspace Input Styles */
-.guided-workspace-input {
-  transition: all 0.2s ease-in-out;
-  font-size: 1rem;
-  line-height: 1.5;
-}
-
-.guided-workspace-input:focus {
-  outline: none;
-}
-
-/* Ensure all components have consistent styling */
-.input,
-.textarea,
-.guided-workspace-input {
-  background-color: rgb(var(--background));
-  color: rgb(var(--foreground));
-  border-color: rgb(var(--input));
-}
-
-.input:focus,
-.textarea:focus,
-.guided-workspace-input:focus {
-  border-color: rgb(var(--primary));
-  box-shadow: 0 0 0 1px rgb(var(--primary) / 50%);
-}
-
-/* Force custom scrollbar styles */
-.custom-scrollbar {
-  scrollbar-width: thin !important;
-  scrollbar-color: rgb(220, 38, 38) rgba(20, 20, 20, 0.3) !important;
-}
-
-.custom-scrollbar::-webkit-scrollbar {
-  width: 8px !important;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(20, 20, 20, 0.3) !important;
-  border-radius: 4px !important;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgb(220, 38, 38) !important;
-  border-radius: 4px !important;
-  border: 2px solid rgba(20, 20, 20, 0.3) !important;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(220, 38, 38, 0.8) !important;
 }
 

@@ -1,84 +1,72 @@
-import type React from "react"
-import { useRef, useEffect } from "react"
-import { ChevronDown, ChevronUp } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+"use client"
+
+import * as React from "react"
+import * as PopoverPrimitive from "@radix-ui/react-popover"
 import { cn } from "@/lib/utils"
 
-interface CustomDropdownProps {
-  isOpen: boolean
-  setIsOpen: (isOpen: boolean) => void
-  triggerContent: React.ReactNode
-  dropdownContent: React.ReactNode
-  className?: string
-  expandDirection?: "left" | "right"
-  dropdownClassName?: string
-  onClose?: () => void
-}
+const CustomDropdown = PopoverPrimitive.Root
 
-export const CustomDropdown: React.FC<CustomDropdownProps> = ({
-  isOpen,
-  setIsOpen,
-  triggerContent,
-  dropdownContent,
-  className,
-  expandDirection = "right",
-  dropdownClassName,
-  onClose,
-}) => {
-  const dropdownRef = useRef<HTMLDivElement>(null)
+const CustomDropdownTrigger = React.forwardRef<
+  React.ElementRef<typeof PopoverPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Trigger>
+>(({ className, ...props }, ref) => (
+  <PopoverPrimitive.Trigger
+    ref={ref}
+    className={cn(
+      "flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium transition-colors",
+      "bg-background hover:bg-primary hover:text-primary-foreground",
+      "border border-border/20 shadow-sm",
+      "focus:outline-none focus:ring-2 focus:ring-border/20 focus:ring-offset-2",
+      className
+    )}
+    {...props}
+  />
+))
+CustomDropdownTrigger.displayName = PopoverPrimitive.Trigger.displayName
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
-        onClose?.()
-      }
-    }
+const CustomDropdownContent = React.forwardRef<
+  React.ElementRef<typeof PopoverPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
+>(({ className, align = "center", sideOffset = 4, ...props }, ref) => (
+  <PopoverPrimitive.Portal>
+    <PopoverPrimitive.Content
+      ref={ref}
+      align={align}
+      sideOffset={sideOffset}
+      className={cn(
+        "z-50 overflow-hidden rounded-md p-1",
+        "bg-background border border-border/20",
+        "shadow-lg shadow-black/10",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        className
+      )}
+      style={{
+        minWidth: 'var(--radix-popper-anchor-width)'
+      }}
+      {...props}
+    />
+  </PopoverPrimitive.Portal>
+))
+CustomDropdownContent.displayName = PopoverPrimitive.Content.displayName
 
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside)
-    }
+const CustomDropdownItem = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm",
+      "outline-none transition-colors",
+      "hover:bg-primary hover:text-primary-foreground",
+      "focus:bg-primary focus:text-primary-foreground",
+      "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      className
+    )}
+    {...props}
+  />
+))
+CustomDropdownItem.displayName = "CustomDropdownItem"
 
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [isOpen, setIsOpen, onClose])
-
-  const handleToggle = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setIsOpen(!isOpen)
-  }
-
-  return (
-    <div ref={dropdownRef} className={cn("relative h-full", className)}>
-      <button
-        className="bg-dark-gray text-light-gray rounded-lg px-3 py-2 text-sm flex items-center justify-between hover:bg-primary hover:text-primary-foreground w-full h-full transition-colors duration-200"
-        onClick={handleToggle}
-        aria-haspopup="true"
-        aria-expanded={isOpen}
-      >
-        {triggerContent}
-        {isOpen ? (
-          <ChevronUp className="h-4 w-4 flex-shrink-0 ml-2" />
-        ) : (
-          <ChevronDown className="h-4 w-4 flex-shrink-0 ml-2" />
-        )}
-      </button>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className={cn("absolute z-[100]", expandDirection === "left" ? "right-0" : "left-0", dropdownClassName)}
-            style={{ top: "100%" }}
-          >
-            <div className="bg-background rounded-md shadow-lg overflow-hidden w-full">{dropdownContent}</div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  )
-}
+export { CustomDropdown, CustomDropdownTrigger, CustomDropdownContent, CustomDropdownItem }
 

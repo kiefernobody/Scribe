@@ -1,7 +1,7 @@
 let userConfig = undefined
 try {
   userConfig = await import('./v0-user-next.config')
-} catch (error) { console.error('Error:', error);
+} catch (e) {
   // ignore error
 }
 

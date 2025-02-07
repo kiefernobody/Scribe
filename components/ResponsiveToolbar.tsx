@@ -1,3 +1,5 @@
+"use client"
+
 import type React from "react"
 import { useState } from "react"
 import { Menu } from "lucide-react"
@@ -10,21 +12,19 @@ interface ToolbarItem {
 }
 
 interface ResponsiveToolbarProps {
-  leftItems: ToolbarItem[]
-  centerItems: ToolbarItem[]
-  rightItems: ToolbarItem[]
+  leftItems?: ToolbarItem[]
+  centerItems?: ToolbarItem[]
+  rightItems?: ToolbarItem[]
   className?: string
   isMobileView: boolean
-  isCollapsed?: boolean
 }
 
 export const ResponsiveToolbar: React.FC<ResponsiveToolbarProps> = ({
-  leftItems,
-  rightItems,
-  centerItems,
+  leftItems = [],
+  centerItems = [],
+  rightItems = [],
   className,
   isMobileView,
-  isCollapsed = false,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
@@ -61,15 +61,13 @@ export const ResponsiveToolbar: React.FC<ResponsiveToolbarProps> = ({
               <div key={item.key}>{item.content}</div>
             ))}
           </div>
-          {!isCollapsed && (
-            <div className="flex items-center justify-center flex-grow">
-              {centerItems.map((item) => (
-                <div key={item.key} className="mx-1">
-                  {item.content}
-                </div>
-              ))}
-            </div>
-          )}
+          <div className="flex items-center justify-center flex-grow">
+            {centerItems.map((item) => (
+              <div key={item.key} className="mx-1">
+                {item.content}
+              </div>
+            ))}
+          </div>
           <div className="flex items-center">
             {rightItems.map((item) => (
               <div key={item.key}>{item.content}</div>

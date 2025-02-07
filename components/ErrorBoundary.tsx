@@ -26,7 +26,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("Uncaught error:", error, errorInfo)
-    errorHandler.logError("Uncaught error in ErrorBoundary", "high", error, "ErrorBoundary", errorInfo)
+    errorHandler.logError(error.message, "high", { error, ...errorInfo as Record<string, unknown> })
     this.setState({ error, errorInfo })
   }
 
@@ -49,6 +49,3 @@ export class ErrorBoundary extends Component<Props, State> {
     return this.props.children
   }
 }
-
-export default ErrorBoundary
-

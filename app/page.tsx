@@ -10,6 +10,6 @@ export default function Home() {
     router.push("/workspace")
   }, [router])
 
-  return null // This page won't render anything as it immediately redirects
+  return null
 }
 

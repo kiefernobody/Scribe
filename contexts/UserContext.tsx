@@ -1,31 +1,42 @@
-import type React from "react"
-import { createContext, useState, useEffect, useContext } from "react"
-import type { User } from "@supabase/supabase-js"
-import { supabase } from "@/utils/supabase"
+"use client"
 
-type UserContextType = {
-  user: User | null
-  loading: boolean
+import React, { createContext, useContext, useState, useEffect } from "react"
+
+interface UserContextType {
+  userId: string | null
+  setUserId: (id: string | null) => void
 }
 
-const UserContext = createContext<UserContextType>({ user: null, loading: true })
+const UserContext = createContext<UserContextType>({
+  userId: null,
+  setUserId: () => {},
+})
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [userId, setUserId] = useState<string | null>(null)
 
   useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
-
-    return () => {
-      authListener.subscription.unsubscribe()
+    // Load user ID from localStorage on mount
+    const storedUserId = localStorage.getItem('userId')
+    if (storedUserId) {
+      setUserId(storedUserId)
     }
   }, [])
 
-  return <UserContext.Provider value={{ user, loading }}>{children}</UserContext.Provider>
+  // Update localStorage when userId changes
+  useEffect(() => {
+    if (userId) {
+      localStorage.setItem('userId', userId)
+    } else {
+      localStorage.removeItem('userId')
+    }
+  }, [userId])
+
+  return (
+    <UserContext.Provider value={{ userId, setUserId }}>
+      {children}
+    </UserContext.Provider>
+  )
 }
 
 export const useUser = () => useContext(UserContext)
