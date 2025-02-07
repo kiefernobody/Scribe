@@ -33,6 +33,7 @@ const WorkspaceClient: React.FC = () => {
   const [currentBreak, setCurrentBreak] = useState<Break | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [isGuidedWorkspace, setIsGuidedWorkspace] = useState(false)
+  const [onResetJournal, setOnResetJournal] = useState<() => void | undefined>(() => () => {})
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -152,41 +153,33 @@ const WorkspaceClient: React.FC = () => {
   }, [])
 
   const updateProjectInStorage = useCallback((updatedProject: Project | null) => {
-    if (updatedProject) {
-      setProjects((prevProjects) => {
-        const updatedProjects = prevProjects.map((p) =>
-          p.id === updatedProject.id
-            ? {
-                ...updatedProject,
-                breaks: updatedProject.breaks.map((breakItem) => ({
-                  ...breakItem,
-                  content: typeof breakItem.content === 'string' 
-                    ? validateAndSanitizeContent(breakItem.content)
-                    : JSON.stringify(breakItem.content)
-                })),
-              }
-            : p
-        );
-        
-        // Ensure we're returning a Project[]
-        return updatedProjects as Project[];
-      });
-
-      localStorage.setItem(
-        "currentProject",
-        JSON.stringify({
-          ...updatedProject,
-          breaks: updatedProject.breaks.map((breakItem) => ({
-            ...breakItem,
-            content: typeof breakItem.content === 'string'
-              ? validateAndSanitizeContent(breakItem.content)
-              : JSON.stringify(breakItem.content)
-          })),
-        })
-      );
-    } else {
+    if (!updatedProject) {
       localStorage.removeItem("currentProject");
+      return;
     }
+
+    // Validate and sanitize all break contents
+    const sanitizedProject = {
+      ...updatedProject,
+      breaks: updatedProject.breaks.map(breakItem => ({
+        ...breakItem,
+        content: validateAndSanitizeContent(breakItem.content)
+      }))
+    };
+
+    // Update projects list in state
+    setProjects(prevProjects => 
+      prevProjects.map(p => 
+        p.id === sanitizedProject.id ? sanitizedProject : p
+      )
+    );
+
+    // Save to localStorage
+    localStorage.setItem("currentProject", JSON.stringify(sanitizedProject));
+    localStorage.setItem("projects", JSON.stringify(sanitizedProject.breaks.map((breakItem) => ({
+      ...breakItem,
+      content: validateAndSanitizeContent(breakItem.content)
+    }))));
   }, []);
 
   const updateProjectsInStorage = useCallback(
@@ -374,6 +367,44 @@ const WorkspaceClient: React.FC = () => {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }, []);
+
+  const handleEraseAllData = useCallback(() => {
+    // Cleanup any temporary image URLs and clear all current notes
+    if (notes) {
+      notes.forEach(note => {
+        if (note.type === "image" && note.isTemporary) {
+          URL.revokeObjectURL(note.content)
+        }
+      })
+    }
+    
+    // Clear all localStorage
+    localStorage.clear()
+    
+    // Reset all state
+    setNotes([]) // Clear current notes
+    setProjects([])
+    setProject(null)
+    setCurrentBreak(null)
+    setMessages([])
+    setIsGuidedWorkspace(false)
+    
+    // Remove specific items to ensure complete cleanup
+    localStorage.removeItem("journalNotes")
+    localStorage.removeItem("currentProject")
+    localStorage.removeItem("projects")
+    localStorage.removeItem("messages")
+    localStorage.removeItem("isGuidedWorkspace")
+    
+    // Create new empty project
+    const emptyProject = createEmptyProject()
+    setProjects([emptyProject])
+    setShowProjectSelector(true)
+    setShouldBlurUI(true)
+
+    // Force journal to reset its internal state
+    onResetJournal?.()
+  }, [notes, setIsGuidedWorkspace, onResetJournal])
 
   // Update the blur effect to cover the entire workspace when project selector is open
   const workspaceStyles = showProjectSelector

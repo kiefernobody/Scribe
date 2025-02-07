@@ -20,6 +20,7 @@ import { Toolbar } from "@/components/ui/toolbar"
 interface JournalNote {
   type: "text" | "image"
   content: string
+  isTemporary?: boolean
 }
 
 interface JournalProps {
@@ -27,13 +28,14 @@ interface JournalProps {
   onAddNote: (note: JournalNote) => void
   isMobileView: boolean
   shouldBlur: boolean
+  onResetJournal?: () => void
 }
 
-const Journal: React.FC<JournalProps> = ({ notes: initialNotes, onAddNote, isMobileView, shouldBlur }) => {
+const Journal: React.FC<JournalProps> = ({ notes: initialNotes, onAddNote, isMobileView, shouldBlur, onResetJournal }) => {
   const [searchTerm, setSearchTerm] = useState("")
   const [newNote, setNewNote] = useState("")
   const [filteredNotes, setFilteredNotes] = useState(initialNotes)
-  const [notes, setNotes] = useState(initialNotes)
+  const [notes, setNotes] = useState<JournalNote[]>(initialNotes)
   const [showWarning, setShowWarning] = useState(false)
   const [lastWarningCount, setLastWarningCount] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -92,15 +94,41 @@ const Journal: React.FC<JournalProps> = ({ notes: initialNotes, onAddNote, isMob
     if (file && (file.type === "image/jpeg" || file.type === "image/png")) {
       const reader = new FileReader()
       reader.onload = (event) => {
-        const newImageNote: JournalNote = { type: "image", content: event.target?.result as string }
+        const imageUrl = URL.createObjectURL(file)
+        const newImageNote: JournalNote = { 
+          type: "image", 
+          content: imageUrl,
+          isTemporary: true
+        }
         const updatedNotes = [...notes, newImageNote]
         setNotes(updatedNotes)
         onAddNote(newImageNote)
-        localStorage.setItem("journalNotes", JSON.stringify(updatedNotes))
+        
+        const storageNotes = updatedNotes.filter(note => 
+          note.type !== "image" || !note.isTemporary
+        )
+        localStorage.setItem("journalNotes", JSON.stringify(storageNotes))
       }
       reader.readAsDataURL(file)
     }
   }
+
+  useEffect(() => {
+    return () => {
+      notes.forEach(note => {
+        if (note.type === "image" && note.isTemporary) {
+          URL.revokeObjectURL(note.content)
+        }
+      })
+    }
+  }, [notes])
+
+  // Add reset handler
+  useEffect(() => {
+    if (onResetJournal) {
+      onResetJournal()
+    }
+  }, [onResetJournal])
 
   return (
     <div
